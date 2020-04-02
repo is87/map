@@ -33,7 +33,7 @@
       height: 5%;
       width: 100%;
       background-color: #333333;
-      color:#ffffff;
+      color: #ffffff;
       text-align: center;
       padding: 5px;
     }
@@ -94,6 +94,12 @@
       width: 50%;
       background-color: #587498;
     }
+
+    #findList > div{
+      background-color: #222222;
+      margin-top: 10px;
+      padding: 5px;
+    }
   </style>
 </head>
 
@@ -102,7 +108,7 @@
   <div id="map"></div>
   <div id="bottomNav">
     <div id="addButton" onclick="toggleMode()">add</div>
-    <div id="findButton" style="background-color: #222222;">find</div>
+    <div id="findButton" onclick="showFind();" style="background-color: #222222;">find</div>
     <div id="moreButton" onclick="showMore();">more</div>
   </div>
   <div class="modal" id="addModal">
@@ -114,20 +120,29 @@
         Longitude: <span id="addLng"></span><br>
       </p>
       Cleanliness - <span id="cleanValue">3</span>/5<br>
-      <input onchange="document.getElementById('cleanValue').textContent=this.value;" type="range" min="1" max="5" value="3" class="slider"><br><br>
+      <input onchange="document.getElementById('cleanValue').textContent=this.value;" type="range" min="1" max="5"
+        value="3" class="slider"><br><br>
       Smell - <span id="smellValue">3</span>/5<br>
-      <input onchange="document.getElementById('smellValue').textContent=this.value;" type="range" min="1" max="5" value="3" class="slider"><br><br>
+      <input onchange="document.getElementById('smellValue').textContent=this.value;" type="range" min="1" max="5"
+        value="3" class="slider"><br><br>
       Amenities - <span id="amenitiesValue">3</span>/5<br>
-      <input onchange="document.getElementById('amenitiesValue').textContent=this.value;" type="range" min="1" max="5" value="3" class="slider"><br><br>
+      <input onchange="document.getElementById('amenitiesValue').textContent=this.value;" type="range" min="1" max="5"
+        value="3" class="slider"><br><br>
       <div
         style="position: absolute; bottom: 20px; left: 20px; right: 20px; background-color:darkgreen; text-align: center; padding: 10px;">
         ADD TOILET</div>
     </div>
   </div>
+  <div class="modal" id="findModal">
+    <div class="modalMenu" id="findMenu">
+      <div onclick="hideFind();" style="position: absolute; top: 10px; right: 10px;">close</div>
+      <div id="findList"></div>
+    </div>
+  </div>
   <div class="modal" id="infoModal">
     <div class="modalMenu" id="infoMenu">
       <div onclick="hideInfo();" style="position: absolute; top: 10px; right: 10px;">close</div>
-      <h2>Public toilet <span id="rating"></span></h2>
+      <h2 id="nameInfo"></h2><h4 id="rating"></h4>
       <p>
         <span id="distanceInfo"></span> away<br>
         <span id="durationInfo"></span> to walk</p>
@@ -154,12 +169,13 @@
   </div>
   <div class="modal" id="moreModal">
     <div class="modalMenu" id="moreMenu">
-      <span onclick="hideMore();">Settings</span>
+      <div onclick="hideMore();" style="position: absolute; top: 10px; right: 10px;">close</div>
+      <h2>Settings</h2>
     </div>
   </div>
   <script>
     mode = 0;
-    data = { "locs": [{ "lat": "64.7510824", "lng": "20.9519385", "cost": "$1", "cleanliness": "70", "smell": "80", "amenities": "50" }, { "lat": "64.7520824", "lng": "20.9730262", "cost": "0", "cleanliness": "40", "smell": "20", "amenities": "30" }, { "lat": "64.7390824", "lng": "20.9682262", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "70" }] };
+    data = { "locs": [{ "name": "Vintergatan", "lat": "64.7510824", "lng": "20.9519385", "cost": "$1", "cleanliness": "70", "smell": "80", "amenities": "50" }, { "name": "Biboköp", "lat": "64.7520824", "lng": "20.9730262", "cost": "0", "cleanliness": "40", "smell": "20", "amenities": "30" }, { "name": "Campus", "lat": "64.7390824", "lng": "20.9682262", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "70" }] };
     // Note: This example requires that you consent to location sharing when
     // prompted by your browser. If you see the error "The Geolocation service
     // failed.", it means you probably did not give permission for the browser to
@@ -297,8 +313,8 @@
           }
 
           map.addListener('click', function (e) {
-              if(mode==1)showAdd(e.latLng.lat(), e.latLng.lng());
-            });
+            if (mode == 1) showAdd(e.latLng.lat(), e.latLng.lng());
+          });
 
         }, function () {
           handleLocationError(true, infoWindow, map.getCenter());
@@ -319,14 +335,15 @@
 
     function showInfo(mid = 100) {
       //document.getElementById("debug").textContent=mid;
-      document.getElementById("rating").textContent = "- " + calculateRating(mid) + "/5";
+      document.getElementById("nameInfo").textContent = data.locs[mid].name;
+      document.getElementById("rating").textContent = calculateRating(mid) + "/5";
       document.getElementById("costInfo").textContent = data.locs[mid].cost;
       document.getElementById("costInfo").style.color = "#ff3333";
-      if(data.locs[mid].cost == "0"){
+      if (data.locs[mid].cost == "0") {
         document.getElementById("costInfo").textContent = "FREE";
         document.getElementById("costInfo").style.color = "#33ff33";
       }
-      if(data.locs[mid].cost == "-1"){
+      if (data.locs[mid].cost == "-1") {
         document.getElementById("costInfo").textContent = "Free for guests";
         document.getElementById("costInfo").style.color = "#ffff33";
       }
@@ -355,18 +372,17 @@
       //console.log(distance);
       document.getElementById("distanceInfo").textContent = distance;
       document.getElementById("durationInfo").textContent = duration;
-}
+    }
 
     function calculateRating(id) {
       loc = data.locs[id];
       average = parseInt((Number(loc.cleanliness) + Number(loc.smell) + Number(loc.amenities)) / 3);
-      average = parseInt(average/2)/10;
+      average = parseInt(average / 2) / 10;
       return average;
     }
 
     function showAdd(lat, lng) {
-      document.getElementById("infoModal").style.visibility = "hidden";
-      document.getElementById("moreModal").style.visibility = "hidden";
+      hideAll();
       document.getElementById("addModal").style.visibility = "visible";
       document.getElementById("addLat").textContent = lat;
       document.getElementById("addLng").textContent = lng;
@@ -380,9 +396,22 @@
       document.getElementById("infoModal").style.visibility = "hidden";
     }
 
+    function showFind() {
+      hideAll();
+      document.getElementById("findModal").style.visibility = "visible";
+      document.getElementById("findList").innerHTML = "";
+      for (i = 0; i < data.locs.length; i++) {
+        document.getElementById("findList").innerHTML += "<div>"+data.locs[i].name+" ("+calculateRating(i)+")</div>";
+      }
+      console.log(document.getElementById("findList").innerHTML);
+    }
+
+    function hideFind() {
+      document.getElementById("findModal").style.visibility = "hidden";
+    }
+
     function showMore() {
-      document.getElementById("addModal").style.visibility = "hidden";
-      document.getElementById("infoModal").style.visibility = "hidden";
+      hideAll();
       document.getElementById("moreModal").style.visibility = "visible";
     }
 
@@ -390,15 +419,20 @@
       document.getElementById("moreModal").style.visibility = "hidden";
     }
 
-    function toggleMode(){
-      if(mode==0){
-        mode=1;
+    function hideAll() {
+      document.getElementById("addModal").style.visibility = "hidden";
+      document.getElementById("findModal").style.visibility = "hidden";
+      document.getElementById("infoModal").style.visibility = "hidden";
+      document.getElementById("moreModal").style.visibility = "hidden";
+    }
+
+    function toggleMode() {
+      if (mode == 0) {
+        mode = 1;
         document.getElementById("topNav").textContent = "EDIT MODE";
-        document.getElementById("addModal").style.visibility = "hidden";
-        document.getElementById("infoModal").style.visibility = "hidden";
-        document.getElementById("moreModal").style.visibility = "hidden";
-      }else{
-        mode=0;
+        hideAll();
+      } else {
+        mode = 0;
         document.getElementById("topNav").textContent = "STANDARD MODE";
       }
     }
