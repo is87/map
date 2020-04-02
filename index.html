@@ -92,21 +92,20 @@
   </div>
   <div class="modal" id="findModal">
     <div class="modalMenu" id="findMenu">
-      <span id="debug"></span>
       <span onclick="hideFind();"><h2>Public toilet</h2></span>
       <p>
-      Latitude: 64.3026439<br>
-      Longitude: 20.9774921</p>
+      Latitude: <span id="latInfo"></span><br>
+      Longitude: <span id="lngInfo"></span></p>
 
-      <p>Cost: $1</p>
+      <p>Cost: <span id="costInfo"></span></p>
       Cleanliness:
-      <div class="barContainer"><div class="bar" style="width: 80%;"></div></div><br>
+      <div class="barContainer"><div id="cleanlinessInfo" class="bar" style="width: 80%;"></div></div><br>
 
       Smell:
-      <div class="barContainer"><div class="bar" style="width: 60%;"></div></div><br>
+      <div class="barContainer"><div id="smellInfo" class="bar" style="width: 60%;"></div></div><br>
 
       Amenities:
-      <div class="barContainer"><div class="bar" style="width: 50%;"></div></div><br>
+      <div class="barContainer"><div id="amenitiesInfo" class="bar" style="width: 50%;"></div></div><br>
     </div>
   </div>
   <div class="modal" id="moreModal">
@@ -115,7 +114,7 @@
     </div>
   </div>
   <script>
-    var data = { "locs": [{ "lat": "64.7510824", "lng": "20.9730262" }, { "lat": "64.7520824", "lng": "20.9730262" }] };
+    data = { "locs": [{ "lat": "64.7510824", "lng": "20.9519385", "cost": "$1", "cleanliness": "70", "smell": "80", "amenities": "50" }, { "lat": "64.7520824", "lng": "20.9730262", "cost": "0", "cleanliness": "40", "smell": "20", "amenities": "30" }] };
     // Note: This example requires that you consent to location sharing when
     // prompted by your browser. If you see the error "The Geolocation service
     // failed.", it means you probably did not give permission for the browser to
@@ -233,20 +232,22 @@
           };
 
           map.setCenter(pos);
-          map.setZoom(15);
+          map.setZoom(14);
           var marker = new google.maps.Marker({ position: pos, map: map, title: 'You are here' });
           var infowindow = new google.maps.InfoWindow({
             content: "Here's a toilet"
           });
 
-          //var markers = [];
+          var markers = [];
           console.log(data.locs[0]);
           for (i = 0; i < data.locs.length; i++) {
-            marker = new google.maps.Marker({ position: { lat: Number(data.locs[i].lat), lng: Number(data.locs[i].lng) }, map: map, icon: image, title: 'Toilet' });
-            marker.addListener('click', function () {
+            markers[i] = new google.maps.Marker({ position: { lat: Number(data.locs[i].lat), lng: Number(data.locs[i].lng) }, map: map, icon: image, title: 'Toilet' });
+            /*markers[i].addListener('click', function (e) {
               //infowindow.open(map, marker);
+              console.log(e.latitude);
               showFind(i);
-            });
+            });*/
+            markers[i].addListener('click', showFind.bind(null, i));
           }
 
         }, function () {
@@ -267,7 +268,13 @@
     }
 
     function showFind(mid=100){
-      document.getElementById("debug").textContent=mid;
+      //document.getElementById("debug").textContent=mid;
+      document.getElementById("latInfo").textContent=data.locs[mid].lat;
+      document.getElementById("lngInfo").textContent=data.locs[mid].lng;
+      document.getElementById("costInfo").textContent=data.locs[mid].cost;
+      document.getElementById("cleanlinessInfo").style.width = data.locs[mid].cleanliness + "%";
+      document.getElementById("smellInfo").style.width = data.locs[mid].smell + "%";
+      document.getElementById("amenitiesInfo").style.width = data.locs[mid].amenities + "%";
       document.getElementById("moreModal").style.visibility = "hidden";
       document.getElementById("findModal").style.visibility = "visible";
     }
