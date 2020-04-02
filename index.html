@@ -11,10 +11,10 @@
        * element that contains the map. */
     #map {
       position: fixed;
-      top: 0;
+      top: 5%;
       left: 0;
       right: 0;
-      height: 90%;
+      height: 85%;
     }
 
     /* Optional: Makes the sample page fill the window. */
@@ -25,6 +25,17 @@
       padding: 0;
       font-family: 'Exo', sans-serif;
 
+    }
+
+    #topNav {
+      position: fixed;
+      top: 0;
+      height: 5%;
+      width: 100%;
+      background-color: #333333;
+      color:#ffffff;
+      text-align: center;
+      padding: 5px;
     }
 
     #bottomNav {
@@ -87,11 +98,31 @@
 </head>
 
 <body>
+  <div id="topNav">STANDARD MODE</div>
   <div id="map"></div>
   <div id="bottomNav">
-    <div id="searchButton">search</div>
-    <div id="findButton" onclick="showFind();" style="background-color: #222222;">find</div>
+    <div id="addButton" onclick="toggleMode()">add</div>
+    <div id="findButton" style="background-color: #222222;">find</div>
     <div id="moreButton" onclick="showMore();">more</div>
+  </div>
+  <div class="modal" id="addModal">
+    <div class="modalMenu" id="addMenu">
+      <div onclick="hideAdd();" style="position: absolute; top: 10px; right: 10px;">close</div>
+      <h2>Add toilet</h2>
+      <p>
+        Latitude: <span id="addLat"></span><br>
+        Longitude: <span id="addLng"></span><br>
+      </p>
+      Cleanliness - <span id="cleanValue">3</span>/5<br>
+      <input onchange="document.getElementById('cleanValue').textContent=this.value;" type="range" min="1" max="5" value="3" class="slider"><br><br>
+      Smell - <span id="smellValue">3</span>/5<br>
+      <input onchange="document.getElementById('smellValue').textContent=this.value;" type="range" min="1" max="5" value="3" class="slider"><br><br>
+      Amenities - <span id="amenitiesValue">3</span>/5<br>
+      <input onchange="document.getElementById('amenitiesValue').textContent=this.value;" type="range" min="1" max="5" value="3" class="slider"><br><br>
+      <div
+        style="position: absolute; bottom: 20px; left: 20px; right: 20px; background-color:darkgreen; text-align: center; padding: 10px;">
+        ADD TOILET</div>
+    </div>
   </div>
   <div class="modal" id="infoModal">
     <div class="modalMenu" id="infoMenu">
@@ -127,6 +158,7 @@
     </div>
   </div>
   <script>
+    mode = 0;
     data = { "locs": [{ "lat": "64.7510824", "lng": "20.9519385", "cost": "$1", "cleanliness": "70", "smell": "80", "amenities": "50" }, { "lat": "64.7520824", "lng": "20.9730262", "cost": "0", "cleanliness": "40", "smell": "20", "amenities": "30" }, { "lat": "64.7390824", "lng": "20.9682262", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "70" }] };
     // Note: This example requires that you consent to location sharing when
     // prompted by your browser. If you see the error "The Geolocation service
@@ -264,6 +296,10 @@
             markers[i].addListener('click', showInfo.bind(null, i));
           }
 
+          map.addListener('click', function (e) {
+              if(mode==1)showAdd(e.latLng.lat(), e.latLng.lng());
+            });
+
         }, function () {
           handleLocationError(true, infoWindow, map.getCenter());
         });
@@ -297,11 +333,10 @@
       document.getElementById("cleanlinessInfo").style.width = data.locs[mid].cleanliness + "%";
       document.getElementById("smellInfo").style.width = data.locs[mid].smell + "%";
       document.getElementById("amenitiesInfo").style.width = data.locs[mid].amenities + "%";
+      document.getElementById("addModal").style.visibility = "hidden";
       document.getElementById("moreModal").style.visibility = "hidden";
       document.getElementById("infoModal").style.visibility = "visible";
 
-      var origin1 = new google.maps.LatLng(55.930385, -3.118425);
-      var origin2 = 'Greenwich, England';
       var destinationB = new google.maps.LatLng(Number(data.locs[mid].lat), Number(data.locs[mid].lng));
 
       var service = new google.maps.DistanceMatrixService();
@@ -329,18 +364,43 @@
       return average;
     }
 
+    function showAdd(lat, lng) {
+      document.getElementById("infoModal").style.visibility = "hidden";
+      document.getElementById("moreModal").style.visibility = "hidden";
+      document.getElementById("addModal").style.visibility = "visible";
+      document.getElementById("addLat").textContent = lat;
+      document.getElementById("addLng").textContent = lng;
+    }
+
+    function hideAdd() {
+      document.getElementById("addModal").style.visibility = "hidden";
+    }
 
     function hideInfo() {
       document.getElementById("infoModal").style.visibility = "hidden";
     }
 
     function showMore() {
+      document.getElementById("addModal").style.visibility = "hidden";
       document.getElementById("infoModal").style.visibility = "hidden";
       document.getElementById("moreModal").style.visibility = "visible";
     }
 
     function hideMore() {
       document.getElementById("moreModal").style.visibility = "hidden";
+    }
+
+    function toggleMode(){
+      if(mode==0){
+        mode=1;
+        document.getElementById("topNav").textContent = "EDIT MODE";
+        document.getElementById("addModal").style.visibility = "hidden";
+        document.getElementById("infoModal").style.visibility = "hidden";
+        document.getElementById("moreModal").style.visibility = "hidden";
+      }else{
+        mode=0;
+        document.getElementById("topNav").textContent = "STANDARD MODE";
+      }
     }
   </script>
   <script async defer
