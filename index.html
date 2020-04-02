@@ -10,6 +10,10 @@
     /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
     #map {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 90%;
     }
 
@@ -41,6 +45,41 @@
       align-items: center;
       color: #ffffff;
     }
+
+    .modal{
+      visibility: hidden;
+      top: 0;
+      left: 0;
+      bottom: 10%;
+      right: 0;
+      position: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      background-color: #ffffff80;
+    }
+    .modalMenu{
+      background-color: #333333;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      color:#ffffff;
+      padding: 20px;
+    }
+    .barContainer{
+      width: 100%;
+      height: 5px;
+      background-color: #555555;
+    }
+    .bar{
+      left: 0;
+      height: 100%;
+      width: 50%;
+      background-color: #587498;
+    }
   </style>
 </head>
 
@@ -48,8 +87,31 @@
   <div id="map"></div>
   <div id="bottomNav">
     <div id="searchButton">search</div>
-    <div id="findButton" style="background-color: #222222;">find</div>
-    <div id="moreButton">more</div>
+    <div id="findButton" onclick="showFind();" style="background-color: #222222;">find</div>
+    <div id="moreButton" onclick="showMore();">more</div>
+  </div>
+  <div class="modal" id="findModal">
+    <div class="modalMenu" id="findMenu">
+      <span onclick="hideFind();"><h2>Public toilet</h2></span>
+      <p>
+      Latitude: 64.3026439<br>
+      Longitude: 20.9774921</p>
+
+      <p>Cost: $1</p>
+      Cleanliness:
+      <div class="barContainer"><div class="bar" style="width: 80%;"></div></div><br>
+
+      Smell:
+      <div class="barContainer"><div class="bar" style="width: 60%;"></div></div><br>
+
+      Amenities:
+      <div class="barContainer"><div class="bar" style="width: 50%;"></div></div><br>
+    </div>
+  </div>
+  <div class="modal" id="moreModal">
+    <div class="modalMenu" id="moreMenu">
+      <span onclick="hideMore();">Settings</span>
+    </div>
   </div>
   <script>
     var data = { "locs": [{ "lat": "64.7510824", "lng": "20.9730262" }, { "lat": "64.7520824", "lng": "20.9730262" }] };
@@ -200,6 +262,24 @@
         'Error: The Geolocation service failed.' :
         'Error: Your browser doesn\'t support geolocation.');
       infoWindow.open(map);
+    }
+
+    function showFind(){
+      document.getElementById("moreModal").style.visibility = "hidden";
+      document.getElementById("findModal").style.visibility = "visible";
+    }
+
+    function hideFind(){
+      document.getElementById("findModal").style.visibility = "hidden";
+    }
+
+    function showMore(){
+      document.getElementById("findModal").style.visibility = "hidden";
+      document.getElementById("moreModal").style.visibility = "visible";
+    }
+
+    function hideMore(){
+      document.getElementById("moreModal").style.visibility = "hidden";
     }
   </script>
   <script async defer
