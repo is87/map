@@ -127,7 +127,7 @@
     </div>
   </div>
   <script>
-    data = { "locs": [{ "lat": "64.7510824", "lng": "20.9519385", "cost": "$1", "cleanliness": "70", "smell": "80", "amenities": "50" }, { "lat": "64.7520824", "lng": "20.9730262", "cost": "0", "cleanliness": "40", "smell": "20", "amenities": "30" }] };
+    data = { "locs": [{ "lat": "64.7510824", "lng": "20.9519385", "cost": "$1", "cleanliness": "70", "smell": "80", "amenities": "50" }, { "lat": "64.7520824", "lng": "20.9730262", "cost": "0", "cleanliness": "40", "smell": "20", "amenities": "30" }, { "lat": "64.7390824", "lng": "20.9682262", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "70" }] };
     // Note: This example requires that you consent to location sharing when
     // prompted by your browser. If you see the error "The Geolocation service
     // failed.", it means you probably did not give permission for the browser to
@@ -283,10 +283,17 @@
 
     function showInfo(mid = 100) {
       //document.getElementById("debug").textContent=mid;
-      document.getElementById("rating").textContent = "- " + calculateRating(mid) + "%";
-      //document.getElementById("latInfo").textContent = data.locs[mid].lat;
-      //document.getElementById("lngInfo").textContent = data.locs[mid].lng;
+      document.getElementById("rating").textContent = "- " + calculateRating(mid) + "/5";
       document.getElementById("costInfo").textContent = data.locs[mid].cost;
+      document.getElementById("costInfo").style.color = "#ff3333";
+      if(data.locs[mid].cost == "0"){
+        document.getElementById("costInfo").textContent = "FREE";
+        document.getElementById("costInfo").style.color = "#33ff33";
+      }
+      if(data.locs[mid].cost == "-1"){
+        document.getElementById("costInfo").textContent = "Free for guests";
+        document.getElementById("costInfo").style.color = "#ffff33";
+      }
       document.getElementById("cleanlinessInfo").style.width = data.locs[mid].cleanliness + "%";
       document.getElementById("smellInfo").style.width = data.locs[mid].smell + "%";
       document.getElementById("amenitiesInfo").style.width = data.locs[mid].amenities + "%";
@@ -318,6 +325,7 @@
     function calculateRating(id) {
       loc = data.locs[id];
       average = parseInt((Number(loc.cleanliness) + Number(loc.smell) + Number(loc.amenities)) / 3);
+      average = parseInt(average/2)/10;
       return average;
     }
 
