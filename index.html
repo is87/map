@@ -135,6 +135,11 @@
   </div>
   <div class="modal" id="findModal">
     <div class="modalMenu" id="findMenu">
+      Order by: 
+      <input type="radio" checked="true" id="orderDistance" name="order" value="distance">
+      <label for="orderDistance">distance</label>
+      <input type="radio" id="orderRating" name="order" value="rating">
+      <label for="orderRating">rating</label>
       <div onclick="hideFind();" style="position: absolute; top: 10px; right: 10px;">close</div>
       <div id="findList"></div>
     </div>
@@ -175,7 +180,7 @@
   </div>
   <script>
     mode = 0;
-    data = { "locs": [{ "name": "Vintergatan", "lat": "64.7510824", "lng": "20.9519385", "cost": "$1", "cleanliness": "70", "smell": "80", "amenities": "50" }, { "name": "Biboköp", "lat": "64.7520824", "lng": "20.9730262", "cost": "0", "cleanliness": "40", "smell": "20", "amenities": "30" }, { "name": "Campus", "lat": "64.7390824", "lng": "20.9682262", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "70" }] };
+    data = { "locs": [{ "name": "Vintergatan", "lat": "64.7514430", "lng": "20.9530681", "cost": "$1", "cleanliness": "60", "smell": "70", "amenities": "50" }, { "name": "Espresso House", "lat": "64.7507458", "lng": "20.9520959", "cost": "-1", "cleanliness": "90", "smell": "90", "amenities": "60" }, { "name": "Ainas Café", "lat": "64.7503940", "lng": "20.9663109", "cost": "-1", "cleanliness": "80", "smell": "70", "amenities": "60" }, { "name": "McDonalds", "lat": "64.7313882", "lng": "20.9760380", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "50" }, { "name": "Stora Coop", "lat": "64.7383501", "lng": "20.9665109", "cost": "0", "cleanliness": "60", "smell": "70", "amenities": "40" }] };
     // Note: This example requires that you consent to location sharing when
     // prompted by your browser. If you see the error "The Geolocation service
     // failed.", it means you probably did not give permission for the browser to
@@ -183,8 +188,9 @@
     var map, infoWindow;
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
+        center: { lat: 64.75, lng: 20.95 },
         disableDefaultUI: true,
+        mapTypeControl: true,
         zoomControl: true,
         zoom: 6,
         styles: [
@@ -384,8 +390,8 @@
     function showAdd(lat, lng) {
       hideAll();
       document.getElementById("addModal").style.visibility = "visible";
-      document.getElementById("addLat").textContent = lat;
-      document.getElementById("addLng").textContent = lng;
+      document.getElementById("addLat").textContent = lat.toFixed(7);
+      document.getElementById("addLng").textContent = lng.toFixed(7);
     }
 
     function hideAdd() {
