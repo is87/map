@@ -46,7 +46,7 @@
       color: #ffffff;
     }
 
-    .modal{
+    .modal {
       visibility: hidden;
       top: 0;
       left: 0;
@@ -59,22 +59,25 @@
       z-index: 100;
       background-color: #ffffff80;
     }
-    .modalMenu{
+
+    .modalMenu {
       background-color: #333333;
       position: absolute;
       top: 20px;
       left: 20px;
       right: 20px;
       bottom: 20px;
-      color:#ffffff;
+      color: #ffffff;
       padding: 20px;
     }
-    .barContainer{
+
+    .barContainer {
       width: 100%;
       height: 5px;
       background-color: #555555;
     }
-    .bar{
+
+    .bar {
       left: 0;
       height: 100%;
       width: 50%;
@@ -90,22 +93,32 @@
     <div id="findButton" onclick="showFind();" style="background-color: #222222;">find</div>
     <div id="moreButton" onclick="showMore();">more</div>
   </div>
-  <div class="modal" id="findModal">
-    <div class="modalMenu" id="findMenu">
-      <span onclick="hideFind();"><h2>Public toilet</h2></span>
+  <div class="modal" id="infoModal">
+    <div class="modalMenu" id="infoMenu">
+      <div onclick="hideInfo();" style="position: absolute; top: 10px; right: 10px;">close</div>
+      <h2>Public toilet <span id="rating"></span></h2>
       <p>
-      Latitude: <span id="latInfo"></span><br>
-      Longitude: <span id="lngInfo"></span></p>
+        <span id="distanceInfo"></span> away<br>
+        <span id="durationInfo"></span> to walk</p>
 
       <p>Cost: <span id="costInfo"></span></p>
       Cleanliness:
-      <div class="barContainer"><div id="cleanlinessInfo" class="bar" style="width: 80%;"></div></div><br>
+      <div class="barContainer">
+        <div id="cleanlinessInfo" class="bar" style="width: 80%;"></div>
+      </div><br>
 
       Smell:
-      <div class="barContainer"><div id="smellInfo" class="bar" style="width: 60%;"></div></div><br>
+      <div class="barContainer">
+        <div id="smellInfo" class="bar" style="width: 60%;"></div>
+      </div><br>
 
       Amenities:
-      <div class="barContainer"><div id="amenitiesInfo" class="bar" style="width: 50%;"></div></div><br>
+      <div class="barContainer">
+        <div id="amenitiesInfo" class="bar" style="width: 50%;"></div>
+      </div><br>
+      <div
+        style="position: absolute; bottom: 20px; left: 20px; right: 20px; background-color: crimson; text-align: center; padding: 10px;">
+        TAKE ME THERE</div>
     </div>
   </div>
   <div class="modal" id="moreModal">
@@ -216,6 +229,7 @@
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
+          myPos = pos;
 
           /*infoWindow.setPosition(pos);
           infoWindow.setContent('Location found.');
@@ -247,7 +261,7 @@
               console.log(e.latitude);
               showFind(i);
             });*/
-            markers[i].addListener('click', showFind.bind(null, i));
+            markers[i].addListener('click', showInfo.bind(null, i));
           }
 
         }, function () {
@@ -267,28 +281,57 @@
       infoWindow.open(map);
     }
 
-    function showFind(mid=100){
+    function showInfo(mid = 100) {
       //document.getElementById("debug").textContent=mid;
-      document.getElementById("latInfo").textContent=data.locs[mid].lat;
-      document.getElementById("lngInfo").textContent=data.locs[mid].lng;
-      document.getElementById("costInfo").textContent=data.locs[mid].cost;
+      document.getElementById("rating").textContent = "- " + calculateRating(mid) + "%";
+      //document.getElementById("latInfo").textContent = data.locs[mid].lat;
+      //document.getElementById("lngInfo").textContent = data.locs[mid].lng;
+      document.getElementById("costInfo").textContent = data.locs[mid].cost;
       document.getElementById("cleanlinessInfo").style.width = data.locs[mid].cleanliness + "%";
       document.getElementById("smellInfo").style.width = data.locs[mid].smell + "%";
       document.getElementById("amenitiesInfo").style.width = data.locs[mid].amenities + "%";
       document.getElementById("moreModal").style.visibility = "hidden";
-      document.getElementById("findModal").style.visibility = "visible";
+      document.getElementById("infoModal").style.visibility = "visible";
+
+      var origin1 = new google.maps.LatLng(55.930385, -3.118425);
+      var origin2 = 'Greenwich, England';
+      var destinationB = new google.maps.LatLng(Number(data.locs[mid].lat), Number(data.locs[mid].lng));
+
+      var service = new google.maps.DistanceMatrixService();
+      service.getDistanceMatrix(
+        {
+          origins: [myPos],
+          destinations: [destinationB],
+          travelMode: 'WALKING',
+        }, callback);
     }
 
-    function hideFind(){
-      document.getElementById("findModal").style.visibility = "hidden";
+    function callback(response, status) {
+      //console.log(response);
+      distance = response.rows[0].elements[0].distance.text;
+      duration = response.rows[0].elements[0].duration.text;
+      //console.log(distance);
+      document.getElementById("distanceInfo").textContent = distance;
+      document.getElementById("durationInfo").textContent = duration;
+}
+
+    function calculateRating(id) {
+      loc = data.locs[id];
+      average = parseInt((Number(loc.cleanliness) + Number(loc.smell) + Number(loc.amenities)) / 3);
+      return average;
     }
 
-    function showMore(){
-      document.getElementById("findModal").style.visibility = "hidden";
+
+    function hideInfo() {
+      document.getElementById("infoModal").style.visibility = "hidden";
+    }
+
+    function showMore() {
+      document.getElementById("infoModal").style.visibility = "hidden";
       document.getElementById("moreModal").style.visibility = "visible";
     }
 
-    function hideMore(){
+    function hideMore() {
       document.getElementById("moreModal").style.visibility = "hidden";
     }
   </script>
