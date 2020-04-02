@@ -176,12 +176,12 @@
             content: "Here's a toilet"
           });
 
-
+          var markers = [];
           console.log(data.locs[0]);
           for (i = 0; i < data.locs.length; i++) {
-            var marker = new google.maps.Marker({ position: { lat: Number(data.locs[i].lat), lng: Number(data.locs[i].lng) }, map: map, icon: image, title: 'Toilet' });
-            marker.addListener('click', function () {
-              infowindow.open(map, marker);
+            markers[i] = new google.maps.Marker({ position: { lat: Number(data.locs[i].lat), lng: Number(data.locs[i].lng) }, map: map, icon: image, title: 'Toilet' });
+            markers[i].addListener('click', function () {
+              infowindow.open(map, markers[i]);
             });
           }
 
