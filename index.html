@@ -92,6 +92,7 @@
   </div>
   <div class="modal" id="findModal">
     <div class="modalMenu" id="findMenu">
+      <span id="debug"></span>
       <span onclick="hideFind();"><h2>Public toilet</h2></span>
       <p>
       Latitude: 64.3026439<br>
@@ -243,7 +244,8 @@
           for (i = 0; i < data.locs.length; i++) {
             marker = new google.maps.Marker({ position: { lat: Number(data.locs[i].lat), lng: Number(data.locs[i].lng) }, map: map, icon: image, title: 'Toilet' });
             marker.addListener('click', function () {
-              infowindow.open(map, marker);
+              //infowindow.open(map, marker);
+              showFind(i);
             });
           }
 
@@ -264,7 +266,8 @@
       infoWindow.open(map);
     }
 
-    function showFind(){
+    function showFind(mid=100){
+      document.getElementById("debug").textContent=mid;
       document.getElementById("moreModal").style.visibility = "hidden";
       document.getElementById("findModal").style.visibility = "visible";
     }
