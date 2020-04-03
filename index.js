@@ -137,6 +137,8 @@ function showInfo(mid = 100) {
   document.getElementById("moreModal").style.visibility = "hidden";
   document.getElementById("infoModal").style.visibility = "visible";
 
+  document.getElementById("directionLink").href = "https://www.google.com/maps/dir/?api=1&travelmode=walking&destination="+data.locs[mid].lat+","+data.locs[mid].lng;
+
   var destinationB = new google.maps.LatLng(Number(data.locs[mid].lat), Number(data.locs[mid].lng));
 
   var service = new google.maps.DistanceMatrixService();
