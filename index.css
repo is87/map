@@ -2,10 +2,10 @@
        * element that contains the map. */
        #map {
         position: fixed;
-        top: 5%;
+        top: 0;
         left: 0;
         right: 0;
-        height: 85%;
+        height: 90%;
       }
   
       /* Optional: Makes the sample page fill the window. */
@@ -21,7 +21,7 @@
       #topNav {
         position: fixed;
         top: 0;
-        height: 5%;
+        height: 0;
         width: 100%;
         background-color: #333333;
         color: #ffffff;

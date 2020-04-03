@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Geolocation</title>
+  <title>Loocation</title>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
   <meta charset="utf-8">
   <link href="https://fonts.googleapis.com/css2?family=Exo:wght@300&display=swap" rel="stylesheet">
@@ -29,9 +29,9 @@
         Longitude: <span id="addLng"></span><br>
       </p>
       Name<br>
-      <input class="tInput" type="text" placeholder="Name of location" ><br><br>
-      Cleanliness - <span id="cleanValue">3</span>/5<br>
-      <input onchange="document.getElementById('cleanValue').textContent=this.value;" type="range" min="1" max="5"
+      <input id="nameValue" class="tInput" type="text" placeholder="Name of location" ><br><br>
+      Cleanliness - <span id="cleanlinessValue">3</span>/5<br>
+      <input onchange="document.getElementById('cleanlinessValue').textContent=this.value;" type="range" min="1" max="5"
         value="3" class="slider"><br><br>
       Smell - <span id="smellValue">3</span>/5<br>
       <input onchange="document.getElementById('smellValue').textContent=this.value;" type="range" min="1" max="5"
@@ -39,7 +39,7 @@
       Amenities - <span id="amenitiesValue">3</span>/5<br>
       <input onchange="document.getElementById('amenitiesValue').textContent=this.value;" type="range" min="1" max="5"
         value="3" class="slider"><br><br>
-      <div
+      <div onclick="addToilet();"
         style="position: absolute; bottom: 20px; left: 20px; right: 20px; background-color:darkgreen; text-align: center; padding: 10px;">
         ADD TOILET</div>
     </div>

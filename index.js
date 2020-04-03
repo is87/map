@@ -254,10 +254,30 @@ mode = 0;
     function toggleMode() {
       if (mode == 0) {
         mode = 1;
-        document.getElementById("topNav").textContent = "EDIT MODE";
+        document.getElementById("topNav").textContent = "EDIT MODE - click on map to add toilet";
+        document.getElementById("topNav").style.color = "#ffff33";
+        document.getElementById("map").style.top = "5%";
+        document.getElementById("map").style.height = "85%";
+        document.getElementById("topNav").style.height = "5%";
         hideAll();
       } else {
         mode = 0;
         document.getElementById("topNav").textContent = "STANDARD MODE";
+        document.getElementById("topNav").style.color = "#ffffff";
+        document.getElementById("map").style.top = "0";
+        document.getElementById("map").style.height = "90%";
+        document.getElementById("topNav").style.height = "0";
+        hideAll();
       }
+    }
+
+    function addToilet(){
+      toilet = new Object();
+      toilet.name = document.getElementById("nameValue").value;
+      toilet.lat = document.getElementById("addLat").textContent;
+      toilet.lng = document.getElementById("addLng").textContent;
+      toilet.cleanliness = (document.getElementById("cleanlinessValue").textContent*20).toString();
+      toilet.smell = (document.getElementById("smellValue").textContent*20).toString();
+      toilet.amenities = (document.getElementById("amenitiesValue").textContent*20).toString();
+      console.log(toilet);
     }
