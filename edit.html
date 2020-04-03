@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit data</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+        td {
+            padding: 5px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        data = null;
+        $(document).ready(function () {
+            $.post("https://isak.pythonanywhere.com/loo/",
+                {
+                    action: "read",
+                },
+                function (dat, status) {
+                    data = dat;
+                    for (i = 0; i < data.locs.length; i++) {
+                        loo = data.locs[i];
+                        rad = "<tr>";
+                        rad += "<td><input type='text' value='" + loo.name + "'></td>";
+                        rad += "<td><input type='text' value='" + loo.lat + "'></td>";
+                        rad += "<td><input type='text' value='" + loo.lng + "'></td>";
+                        rad += "<td><input type='text' value='" + loo.cost + "'></td>";
+                        rad += "<td><input type='text' value='" + loo.cleanliness + "'></td>";
+                        rad += "<td><input type='text' value='" + loo.smell + "'></td>";
+                        rad += "<td><input type='text' value='" + loo.amenities + "'></td>";
+                        rad += "<td><button onClick='deleteRow(this)'>Delete</td>";
+                        rad += "</tr>";
+                        document.getElementById("table").innerHTML += rad;
+                    }
+                });
+        });
+
+        function saveData() {
+            console.log(JSON.stringify(data, null, 2));
+            data2 = new Object();
+            data2.locs = [];
+            for (i = 1; i < document.getElementById("table").rows.length; i++) {
+                rad = document.getElementById("table").rows[i];
+                locData = new Object();
+                locData.name = rad.cells[0].firstChild.value;
+                locData.lat = rad.cells[1].firstChild.value;
+                locData.lng = rad.cells[2].firstChild.value;
+                locData.cost = rad.cells[3].firstChild.value;
+                locData.cleanliness = rad.cells[4].firstChild.value;
+                locData.smell = rad.cells[5].firstChild.value;
+                locData.amenities = rad.cells[6].firstChild.value;
+                data2.locs.push(locData);
+            }
+            console.log(JSON.stringify(data2, null, 2));
+            $.post("https://isak.pythonanywhere.com/loo/",
+                {
+                    action: "write",
+                    password: "pass123",
+                    data: JSON.stringify(data2, null, 2)
+                },
+                function (answer, status) {
+                    console.log(answer);
+                });
+        }
+
+        function deleteRow(r) {
+            var i = r.parentNode.parentNode.rowIndex;
+            document.getElementById("table").deleteRow(i);
+        }
+
+        function addRow() {
+            rad = "<tr>";
+            rad += "<td><input type='text' value=''></td>";
+            rad += "<td><input type='text' value=''></td>";
+            rad += "<td><input type='text' value=''></td>";
+            rad += "<td><input type='text' value=''></td>";
+            rad += "<td><input type='text' value=''></td>";
+            rad += "<td><input type='text' value=''></td>";
+            rad += "<td><input type='text' value=''></td>";
+            rad += "<td><button onClick='deleteRow(this)'>Delete</td>";
+            rad += "</tr>";
+            document.getElementById("table").innerHTML += rad;
+        }
+
+    </script>
+</head>
+<table id="table">
+    <tr>
+        <td>Name</td>
+        <td>Latitude</td>
+        <td>Longitude</td>
+        <td>Cost</td>
+        <td>Cleanliness</td>
+        <td>Smell</td>
+        <td>Amenities</td>
+    </tr>
+</table>
+<br><br>
+<button onclick="addRow();">Add location</button><br><br>
+<button onclick="saveData();">Save</button>
+
+<body>
+</body>
+
+</html>
