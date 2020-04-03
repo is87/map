@@ -1,11 +1,19 @@
 mode = 0;
 marker = null;
 markers = [];
-data = { "locs": [{ "name": "Vintergatan", "lat": "64.7515032", "lng": "20.9523000", "cost": "$1", "cleanliness": "60", "smell": "70", "amenities": "50" }, { "name": "Espresso House", "lat": "64.7507458", "lng": "20.9520959", "cost": "-1", "cleanliness": "90", "smell": "90", "amenities": "60" }, { "name": "Ainas Café", "lat": "64.7503940", "lng": "20.9663109", "cost": "-1", "cleanliness": "80", "smell": "70", "amenities": "60" }, { "name": "McDonalds", "lat": "64.7313882", "lng": "20.9760380", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "50" }, { "name": "Stora Coop", "lat": "64.7383501", "lng": "20.9665109", "cost": "0", "cleanliness": "60", "smell": "70", "amenities": "40" }] };
+data = null;
+//data = { "locs": [{ "name": "Vintergatan", "lat": "64.7515032", "lng": "20.9523000", "cost": "$1", "cleanliness": "60", "smell": "70", "amenities": "50" }, { "name": "Espresso House", "lat": "64.7507458", "lng": "20.9520959", "cost": "-1", "cleanliness": "90", "smell": "90", "amenities": "60" }, { "name": "Ainas Café", "lat": "64.7503940", "lng": "20.9663109", "cost": "-1", "cleanliness": "80", "smell": "70", "amenities": "60" }, { "name": "McDonalds", "lat": "64.7313882", "lng": "20.9760380", "cost": "-1", "cleanliness": "90", "smell": "80", "amenities": "50" }, { "name": "Stora Coop", "lat": "64.7383501", "lng": "20.9665109", "cost": "0", "cleanliness": "60", "smell": "70", "amenities": "40" }] };
 // Note: This example requires that you consent to location sharing when
 // prompted by your browser. If you see the error "The Geolocation service
 // failed.", it means you probably did not give permission for the browser to
 // locate you.
+
+$(document).ready(function(){
+
+  console.log("Hello");
+  $.getScript("https://maps.googleapis.com/maps/api/js?key=AIzaSyBQhMKpUkmBY6uCHJ9sERBoCw0OlE9srjI&callback=initMap");
+  });
+
 var map, infoWindow;
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
@@ -235,7 +243,17 @@ function addToilet() {
   data.locs.push(toilet);
   console.log(data);
   hideAdd();
-  locateAndLoad();
+  $.post("https://isak.pythonanywhere.com/loo/",
+  {
+    action: "write",
+    password: "pass123",
+    data: JSON.stringify(data, null, 2)
+  },
+  function(answer, status){
+    console.log(answer);
+    locateAndLoad();
+  });
+  
 }
 
 function locateAndLoad() {
@@ -258,7 +276,7 @@ function locateAndLoad() {
         }
       }
 
-      var image = {
+      image = {
         url: 'toilets_inclusive.png',
         // This marker is 20 pixels wide by 32 pixels high.
         size: new google.maps.Size(32, 37),
@@ -272,17 +290,8 @@ function locateAndLoad() {
       map.setZoom(14);
       var marker = new google.maps.Marker({ position: pos, map: map, title: 'You are here' });
 
-      var markers = [];
-      console.log(data.locs[0]);
-      for (i = 0; i < data.locs.length; i++) {
-        markers[i] = new google.maps.Marker({ position: { lat: Number(data.locs[i].lat), lng: Number(data.locs[i].lng) }, map: map, icon: image, title: 'Toilet' });
-        /*markers[i].addListener('click', function (e) {
-          //infowindow.open(map, marker);
-          console.log(e.latitude);
-          showFind(i);
-        });*/
-        markers[i].addListener('click', showInfo.bind(null, i));
-      }
+      //loadMarkers();
+      loadJSON();
 
       map.addListener('click', function (e) {
         if (mode == 1) showAdd(e.latLng.lat(), e.latLng.lng());
@@ -295,4 +304,28 @@ function locateAndLoad() {
     // Browser doesn't support Geolocation
     handleLocationError(false, infoWindow, map.getCenter());
   }
+}
+
+function loadJSON(){
+
+$.post("https://isak.pythonanywhere.com/loo/",
+  {
+    action: "read",
+  },
+  function(dat, status){
+    data = dat;
+    //console.log(JSON.stringify(data));
+    console.log("Data fetched. Initializing...");
+    loadMarkers();
+  });
+
+}
+
+function loadMarkers(){
+  var markers = [];
+      console.log(data.locs[0]);
+      for (i = 0; i < data.locs.length; i++) {
+        markers[i] = new google.maps.Marker({ position: { lat: Number(data.locs[i].lat), lng: Number(data.locs[i].lng) }, map: map, icon: image, title: 'Toilet' });
+        markers[i].addListener('click', showInfo.bind(null, i));
+      }
 }
